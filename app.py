@@ -18,7 +18,7 @@ Base = automap_base()
 Base.prepare(engine, reflect=True)
 
 # Save reference to the table
-Measurment = Base.classes.measurment
+Measurement = Base.classes.measurement
 Station = Base.classes.station
 
 # Create our session (link) from Python to the DB
@@ -73,7 +73,7 @@ def stations():
 def temp():
 #query for dates and tobs from a year from the last data point 2017-08-23
     prev_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)
-    results=session.query(Measurement.tobs,Measurment.date).filter(Measurement.date>=prev_year)
+    results=session.query(Measurement.tobs, Measurement.date).filter(Measurement.date>=prev_year)
 
     last_year_tobs=list(np.ravel(results))
     return jsonify(last_year_tobs)
@@ -88,21 +88,17 @@ def min_avg_max_temp_start_date_to_end_date(start=None, end=None):
 
  # Select statement
    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
-
    if not end:
        # calculate TMIN, TAVG, TMAX for dates greater than start
-       results = session.query(*sel).\
-           filter(Measurement.date >= start).all()
+    results = session.query(*sel).filter(Measurement.date >= start).all()
        # Unravel results into a 1D array and convert to a list
-       temps = list(np.ravel(results))
-       return jsonify(temps)
-
-   # calculate TMIN, TAVG, TMAX with start and stop
-    results = session.query(*sel).\
-        filter(Measurement.date >= start).\
-        filter(Measurement.date <= end).all()
-   # Unravel results into a 1D array and convert to a list
+    temps = list(np.ravel(results))
+    #return jsonify(temps)
+    # calculate TMIN, TAVG, TMAX with start and stop
+    results = session.query(*sel).filter(Measurement.date >= start).filter(Measurement.date <= end).all()
+    # Unravel results into a 1D array and convert to a list
     temps = list(np.ravel(results))
     return jsonify(temps)
-if__name__=='__main__':
+
+if __name__=='__main__':
     app.run()
